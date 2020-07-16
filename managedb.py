@@ -22,6 +22,7 @@ class databaseManager():
             print(e)
             
     def insertintoCPECVE(self,values):
+        '''CPECVE(cpeID,cveID)'''
         sqlquery = '''insert into CPECVE(cpeID,cveID) values(?,?);'''
         try:
             self.cur.execute(sqlquery,(values))
@@ -38,14 +39,7 @@ class databaseManager():
         except sqlite3.Error as e:
             print(e)
     
-    def insertintoCPE(self,values):
-        sqlquery = '''insert into CPE23URI(cveID,cpe23uri,vulnerable) values(?,?,?);'''
 
-        try:
-            self.cur.execute(sqlquery,(values))
-            self.conn.commit()
-        except sqlite3.Error as e:
-            print(e)
 
     def insertintoCVSS3(self,values):
         sqlquery = '''insert into CVSS3(cveID,version,vectorString,attackVector,attackComplexity

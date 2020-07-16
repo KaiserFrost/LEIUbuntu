@@ -4,11 +4,12 @@ import sys
 import re
 import sys
 import requests
-
+from storeData import *
 cpematch = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString="
 
-'''Vai buscar os programas instalados, caso estejam instalados'''
+
 def getProductList():
+    '''Vai buscar os programas instalados, caso estejam instalados'''
     productList = []
     dpkg = "dpkg-query -W -f='${Package} ${Version}\n'"
     results = check_output(dpkg,shell=True)
@@ -25,8 +26,9 @@ def getProductList():
 
     return ("debian",productList)
 
-'''Vai buscar os modulos do python, caso o python esteja instalado'''
+
 def getpythonmodules():
+    '''Vai buscar os modulos do python, caso o python esteja instalado'''
 
     if(sys.version_info[0] == 2):
         command = "pip list --format=freeze"
@@ -42,17 +44,19 @@ def getpythonmodules():
         listpip.append(re.split("==",values))
     return ("python",listpip)
 
-'''
-turnCPE(tuple, Bool)
 
-tuple = vendor,listaprodutos
-Bool = True = NoVersion
-
-Recebe um tuple com o vendor e a lista de produtos instalados
-como também uma flag,que caso seja True,
-procura estes produtos sem a versão especificada
-'''
 def turnCPE(tuplewithlistandvendor,NoVersion = False):
+    '''
+    turnCPE(tuple, Bool)
+
+    tuple = vendor,listaprodutos
+
+    Bool if True = NoVersion
+
+    Recebe um tuple com o vendor e a lista de produtos instalados
+    como também uma flag,que caso seja True,
+    procura estes produtos sem a versão especificada
+    '''
     vendor,listofsoft = tuplewithlistandvendor
     cpelist = []
     for programs in listofsoft:
@@ -99,31 +103,24 @@ def turnCPE(tuplewithlistandvendor,NoVersion = False):
         #with open ("file.txt","a")  as file:
             #file.write(cpe23 + "\n")
 
-'''
-Procura pelos CVE na base de dados da NIST, usando para isto
-a API especificada.
-Recebe um tuple, que contem o vendor, o nome do programa, a versão e o cpe
-'''
-def getCVE(cpelist):
 
+def getCVE(cpelist):
+    '''
+    Procura pelos CVE na base de dados da NIST, usando para isto
+    a API especificada.
+    Recebe um tuple, que contem o vendor, o nome do programa, a versão e o cpe
+    '''
     for cpe in cpelist:
         getcpe = requests.get(cpematch +cpe[3])
         if getcpe.ok:
-
+            
             data = getcpe.json()
-            print("checking  " +cpe)
-            print(data)
-            for cves in data["result"]['CVE_Items']:
-                
-                print((
-                    cves['cve']['CVE_data_meta']['ID'],
-                    cves['cve']['data_type'],
-                    cves['cve']['data_format'],
-                    cves['cve']['data_version'],
-                    cves['cve']['description']['description_data'][0]['value'],
-                    cves['publishedDate'],
-                    cves['lastModifiedDate']))
+            print("checking  " + cpe[3])
+            StoreCPEinPC(cpe,)
+            StoreCVE(data,cpe[3])
+            
                 
 #getProductList()
-cpelist = turnCPE(getProductList(), True)
+cpelist = turnCPE(getpythonmodules(), True)
 
+getCVE(cpelist)

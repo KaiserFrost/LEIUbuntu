@@ -79,7 +79,7 @@ obtainUserPrivilege bool,
 obtainOtherPrivilege bool,
 userInteractionRequired bool);'''
 
-sqlstatments = [createallcve,createcpeuri,createcvss3,createcvss2]
+sqlstatments = [createCPEinPC,createCPECVE,createallcve,createcpeuri,createcvss3,createcvss2]
 
 for sql in sqlstatments:
    db.execute(sql)
