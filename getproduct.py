@@ -5,8 +5,9 @@ import re
 import sys
 import requests
 from storeData import *
-cpematch = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString="
+from datetime import datetime
 
+cpematch = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString="
 
 def getProductList():
     '''Vai buscar os programas instalados, caso estejam instalados'''
@@ -116,11 +117,10 @@ def getCVE(cpelist):
             
             data = getcpe.json()
             print("checking  " + cpe[3])
-            StoreCPEinPC(cpe,)
+            StoreCPEinPC(cpe,datetime.today().strftime('%Y-%m-%d'))
             StoreCVE(data,cpe[3])
             
                 
 #getProductList()
 cpelist = turnCPE(getpythonmodules(), True)
-
 getCVE(cpelist)
