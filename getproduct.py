@@ -122,5 +122,7 @@ def getCVE(cpelist):
             
                 
 #getProductList()
-cpelist = turnCPE(getpythonmodules(), True)
-getCVE(cpelist)
+cpelistmodule = turnCPE(getpythonmodules(), True)
+cpelistproduct = turnCPE(getProductList(), True)
+getCVE(cpelistmodule)
+getCVE(cpelistproduct)
