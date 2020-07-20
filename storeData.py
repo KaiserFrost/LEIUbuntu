@@ -1,3 +1,4 @@
+from gettext import dngettext
 import requests
 import sqlite3
 import json
@@ -10,28 +11,17 @@ from managedb import databaseManager
 dbmanager = databaseManager()
 
 def StoreCPEinPC(cpedata,date):
-    dbmanager.insertintoCPEinPC((cpedata[3],cpedata[0],cpedata[1],cpedata[2],date))
+    if(dbmanager.checkifCPEalreadyinPC(cpedata[3]) == 0):
+        dbmanager.insertintoCPEinPC((cpedata[3],cpedata[0],cpedata[1],cpedata[2],date))
+    else:
+        dbmanager.UpdateCPEinPCTable(date,cpedata[3])
 
 def StoreCVE(data,cpe):
     '''Recebe os dados obtidos do NIST, como tambem o cpe para guardar na base de dados'''
     for cves in data["result"]['CVE_Items']:
         if cves != []:
             dbmanager.insertintoCPECVE((str(cpe),cves['cve']['CVE_data_meta']['ID']))
-            '''# TABELA AllCVE
-            #ID do cve
-            print(cves['cve']['CVE_data_meta']['ID'])
-            #Tipo de Dado (CVE neste caso)
-            print(cves['cve']['data_type'])
-            #formato dos dados (deve ser sempre MITRE)
-            print(cves['cve']['data_format'])
-            #data_version
-            print(cves['cve']['data_version'])
-            #descrição
-            print(cves['cve']['description']['description_data'][0]['value'])
-            #data de publicação
-            print(cves['publishedDate'])
-            #data de modificação
-            print(cves['lastModifiedDate'])'''
+            
 
             dbmanager.insertintoALLCVE((
                 cves['cve']['CVE_data_meta']['ID'],

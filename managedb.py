@@ -20,6 +20,21 @@ class databaseManager():
             self.conn.commit()
         except sqlite3.Error as e:
             print(e)
+    
+    def checkifCPEalreadyinPC(self,Cpe):
+        sqlquery = "SELECT EXISTS(SELECT 1 FROM CPEinPC WHERE cpeID = ?)"
+        try:
+            self.cur.execute(sqlquery,(Cpe,))
+            return self.cur.fetchone()[0]
+        except sqlite3.Error as e:
+            print(e)
+    def UpdateCPEinPCTable(self,date,Cpe):
+        sqlquery = "UPDATE CPEinPC Set lastSearch = ? WHERE cpeID = ?"
+        try:
+            self.cur.execute(sqlquery,(date,Cpe,))
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print(e)
             
     def insertintoCPECVE(self,values):
         '''CPECVE(cpeID,cveID)'''
@@ -68,11 +83,12 @@ class databaseManager():
         sqlquery = '''SELECT * FROM CPECVE'''
         try:
             self.cur.execute(sqlquery)
-            self.cur.row_factory = lambda cursor, row: {'CPEID': row[0],'CVEID' : row[1]}
+            self.cur.row_factory = lambda cursor, row: [row[0],row[1]]
             rows = self.cur.fetchall()
             return rows
         except sqlite3.Error as e:
             print(e)
+
     def getCVEData(self,cveid):
         sqlquery = "SELECT * FROM ALLCVE where cveID =?"
         try:
@@ -84,3 +100,38 @@ class databaseManager():
             return rows
         except sqlite3.Error as e:
             print(e)
+
+    def getCVSS2Data(self,cveid):
+        sqlquery = "SELECT * FROM CVSS2 where cveID =?"
+        try:
+            self.cur.execute(sqlquery,(cveid,))
+            self.cur.row_factory = lambda cursor, row:{"version":row[1],"vectorString":row[2],
+                                                        "accessVector":row[3], "accessComplexity":row[4],
+                                                        "authentication":row[5],"confidentialityImpact":row[6],
+                                                        "integrityImpact":row[7],"availabilityImpact":row[8],
+                                                        "baseScore":row[9], "severity":row[10],
+                                                        "exploitabilityScore":row[11],"impactScore":row[12],
+                                                        "acInsufInfo":row[13],
+                                                        "obtainAllPrivilege":row[14],"obtainUserPrivilege":row[15],
+                                                        "obtainOtherPrivilege":row[16],"userInteractionRequired": row[17]}
+            rows = self.cur.fetchone()
+            return rows
+        except sqlite3.Error as e:
+            print(e)
+    def getCVSS3Data(self,cveid):
+        sqlquery = "SELECT * FROM CVSS3 where cveID =?"
+        try:
+            self.cur.execute(sqlquery,(cveid,))
+            self.cur.row_factory = lambda cursor, row:{"version":row[1],"vectorString":row[2],
+                                                        "attackVector":row[3], "attackComplexity":row[4],
+                                                        "privilegesRequired":row[5],"userInteraction":row[6],
+                                                        "scope":row[7],"confidentialityImpact":row[8],
+                                                        "integrityImpact":row[9], "availabilityImpact":row[10],
+                                                        "baseScore":row[11],"baseSeverity":row[12],
+                                                        "exploitabilityScore":row[13],
+                                                        "impactScore":row[14]}
+            rows = self.cur.fetchone()
+            return rows
+        except sqlite3.Error as e:
+            print(e)
+    

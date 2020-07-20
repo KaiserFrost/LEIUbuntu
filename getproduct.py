@@ -6,6 +6,7 @@ import sys
 import requests
 from storeData import *
 from datetime import datetime
+import time
 
 cpematch = "https://services.nvd.nist.gov/rest/json/cves/1.0?cpeMatchString="
 
@@ -120,9 +121,8 @@ def getCVE(cpelist):
             StoreCPEinPC(cpe,datetime.today().strftime('%Y-%m-%d'))
             StoreCVE(data,cpe[3])
             
-                
-#getProductList()
-cpelistmodule = turnCPE(getpythonmodules(), True)
-cpelistproduct = turnCPE(getProductList(), True)
-getCVE(cpelistmodule)
-getCVE(cpelistproduct)
+def getthingsdone(NoVersion=False):
+    cpelistmodule = turnCPE(getpythonmodules(), NoVersion)
+    cpelistproduct = turnCPE(getProductList(), NoVersion)
+    getCVE(cpelistmodule)
+    getCVE(cpelistproduct)

@@ -1,35 +1,52 @@
 from os import terminal_size
+from threading import Thread
 from storeData import dbmanager
 from flask_table import Table, Col, LinkCol
-from flask import Flask
+from flask import Flask,render_template,request,flash,redirect
 from managedb import databaseManager
-
+from getproduct import getthingsdone
+from threading import Thread
 
 app = Flask(__name__)
 
-class ItemTable(Table):
-    CPEID = Col('CPEID')
-    CVEID = LinkCol('CVEID','single_item',url_kwargs=dict(CVEID='CVEID'),attr ='CVEID')
+dbmanager = databaseManager()
+
+@app.route('/', methods=('GET', 'POST'))
+def main():
+
+    if(request.form.get("resulbutton")):
+        
+        return  redirect("/results")
+
+    elif(request.form.get("analbutton")):
+        getthingsdone()
+        return  redirect("/results")
+
+    return render_template('frontpage.html')
+
+@app.route('/Analise', methods=('GET', 'POST'))
+def proce():
+
+    return render_template('loading.html')
 
 
-
-@app.route('/')
+@app.route('/results')
 def index():
-    dbmanager = databaseManager()
+    
     rows = dbmanager.getCPE()
-    table = ItemTable(rows)
-
-    # You would usually want to pass this out to a template with
-    # render_template.
-    return table.__html__()
+    headers = ['CPEID','CVEID']
+    if(len(rows) > 0):
+        return render_template('cpefound.html',headers=headers,rows=rows)
+    else:
+        return "nothing here yet"
 
 @app.route('/item/<string:CVEID>')
 def single_item(CVEID):
-    rows = dbmanager.getCVEData(CVEID)
-    print(rows)
+    rowCVE = dbmanager.getCVEData(CVEID)
+    rowCVSS2 = dbmanager.getCVSS2Data(CVEID)
+    rowCVSS3 = dbmanager.getCVSS3Data(CVEID)
     # Similarly, normally you would use render_template
-    return '<h1>{}</h1><p>{}</p><hr><small>data: {}</small>'.format(
-        rows['cveID'], rows['description'], rows['publishedDate'])
+    return render_template('cvedetail.html',rowCVSS2=rowCVSS2,rowCVE=rowCVE,rowCVSS3=rowCVSS3)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=5002)
