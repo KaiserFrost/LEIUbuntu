@@ -1,4 +1,6 @@
 # LEIUbuntu
 
-pip install flask   
+pip install flask
+
+O joao n sabe fazer rosca
 
