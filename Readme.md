@@ -1,4 +1,3 @@
 # LEIUbuntu
 
-pip install flask 
-pip install Flask-Table
+pip install flask   
